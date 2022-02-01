@@ -1,8 +1,6 @@
 import json
-import os
 import names
 from random import random, randint, choice
-import threading
 
 json_file_to_load = 'Broncitis'
 
@@ -15,8 +13,6 @@ with open(f'{json_file_to_load}.json', 'r') as f:
 
 # Easy to grab the data from the .json  file instead of creating new variables in 
 # the .py file to put them in.
-
-# NEED TO CHANGE THE CLASS 
 
 class Person:
     def __init__(self) -> None:
@@ -55,6 +51,7 @@ class Person:
         self.peopleInfected : list[(str, int)] = []
         self.assist : list[(str, int)] = []
     
+    # reeeeefactor timeeee
     def getOH(self):
         # Need to take into account age , need to take into account overall public health
         # Need to change calculation , random at the moment
@@ -106,13 +103,13 @@ class Person:
 
         """)
     
-    def infect(self):
+    def getInfected(self):
         self.infected = True
         self.incubating = True
         self.incubationDays +=1
         self.daysLastedWithoutInfection = 0
 
-
+    # time baby refactor
     def getImmunity(self):
         # Need to take into account other stuff
         # Need to change calculation
@@ -123,7 +120,8 @@ class Person:
         else:
             self.pImmune = True
 
-    def isDead(self,population,infectedPersonIndex):
+    # refactor time
+    def chanceOfDying(self):
         ## Need to take into account age effect data 
         # need to take into account disease dange 
         if self.contagious == True:
@@ -141,12 +139,30 @@ class Person:
             if deathChance > defiDeath:
                 self.alive = False
                 self.overallHealth = 0.0
+                # do this outside of the function 
                 if self.peopleWhoInfectedThem:
                     population[self.peopleWhoInfectedThem[-1]].assist.append(infectedPersonIndex)
+    
+    def newDay(self):
+        if self.incubating:
+            if self.incubationDays > CONSTANTS['diseaseConstants']['incubationPeriod']:
+                self.incubating = False
+                self.contagious = True 
+            else:
+                self.incubationDays += 1
+        else:
+            if self.contagiousDays > CONSTANTS['diseaseConstants']['contagiousPeriod']:  
+                self.contagious = False
+                self.infected = False
+                self.getImmunity()
+            else:
+                self.contagiousDays +=1
 
-    def spread(self,population, infected, infectedPersonIndex):
-        ## Need to take into account age suseptiable data 
-        # Change calculation, really needs to change
+# Refactor time baby 
+def spread(population, infected, infectedPersonIndex):
+    ## Need to take into account age suseptiable data 
+    # Change calculation, really needs to change
+    if population[infectedPersonIndex].contagious:
         diseaseTR = CONSTANTS['diseaseConstants']['diseaseTransmisionRate']
         while True:
             encounterChance = random()
@@ -156,34 +172,15 @@ class Person:
             else:
                 difference = self.social-diseaseTR
                 diseaseTR = difference / 2
-                # need to fix constant loop
                 person = randint(0, (CONSTANTS['cityConstants']['overallPopulation']-1))
-                if population[person].infected == False and population[person].immune == False or population[person].pImmune == False and population[person].alive == True:
-                    population[person].infect()
-                    infected.append(person)
-                    self.peopleInfected.append(person)
-                    population[person].peopleWhoInfectedThem.append(infectedPersonIndex)
+                if population[person].immune == False or population[person].pImmune == False and population[person].alive == True:
+                    if population[person].infected == False:
+                        population[person].infect()
+                        infected.append(person)
+                        population[].peopleInfected.append(person)
+                        population[person].peopleWhoInfectedThem.append(infectedPersonIndex)
         
-        return population, infected
-    
-    # need to take the get immunity and spread out of this and have it changing bools instead of a way to process and 
-    # change lots of data 
-    def day(self, population, infected, infectedPersonIndex):
-        if self.incubating:
-            if self.incubationDays == CONSTANTS['diseaseConstants']['incubationPeriod']:
-                self.incubating = False
-                self.contagious = True 
-            else:
-                self.incubationDays += 1
-        else:
-            if self.contagiousDays == CONSTANTS['diseaseConstants']['contagiousPeriod']:  
-                self.contagious = False
-                self.infected = False
-                self.getImmunity()
-            else:
-                self.contagiousDays +=1
-                self.spread(population, infected, infectedPersonIndex)
-        
+# Visual display of the city, will be converted to matplotlib after the refactor 
 def cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMortality):
     # Should display number of days/weeks/months/years
     print(f'''
@@ -209,33 +206,35 @@ outD = int(input('Please input wether you would like data on a per day[0], per w
 
 day = 0
 while True:
-    # Shoul refactor
+    # Should refactor
     day += 1
-    for i in partialImmunityList:
-        if population[i].particalImmunityDays == CONSTANTS['diseaseConstants']['partialImmunityPeriod']:
-            population[i].pImmune = False
-            a = partialImmunityList.pop(i)
-        population[i].particalImmunityDays += 1
 
-    for i in infected:
-        population[i].isDead(population, i)
-        if population[i].alive == True:
-            population[i].day(population, infected, i)
+    # updates the partialImmunity people
+    for person in partialImmunityList:
+        if population[person].particalImmunityDays > CONSTANTS['diseaseConstants']['partialImmunityPeriod']:
+            population[person].pImmune = False
+            a = partialImmunityList.pop(person)
+            population[person].particalImmunityDays = 0
         else:
-            a = infected.pop()
-            moralityList.append(a)
+            population[person].particalImmunityDays += 1
 
-        if population[i].immune == True:
-            a = infected.pop(i)
-            immunityList.append(a)
-        elif population[i].pImmune == True:
-            a = infected.pop(i)
-            partialImmunityList.append(a)
+    # updates an infected persons day 
+    for person in infected:
+        population[person].newDay()
+        if population[person].immune == True:
+            immunityList.append(infected.pop(person))
+        elif population[person].pImmune == True:
+            partialImmunityList.append(infected.pop(person))
+
+    # spreads the disease 
+    for person in infected:
+        spread(population, infected, person)
     
-    #for people in population:
-        #if people.infected == False:
-         #   people.daysLastedWithoutInfection +=1
-    
+    for person in infected:
+        population[person].chanceOfDying()
+
+## This code should be fine-ish 
+
     # Adding up the values
     numNotInfected = CONSTANTS['cityConstants']['overallPopulation'] - len(infected) - len(moralityList)
     numInfected = len(infected)
@@ -257,11 +256,4 @@ while True:
     elif outD == 3:
         if day % 360 == 0:
             cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMortality)
-            input('Next Year > ')
-        
-
-for i in range(CONSTANTS['cityConstants']['overallPopulation']):
-    population[i].display_personal_info()
-    input('Next Person > ')
-
-## one day 
+            input('Next Year > ') 
