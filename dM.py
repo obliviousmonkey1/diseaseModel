@@ -1,4 +1,3 @@
-from http.client import CONTINUE
 import json
 import names
 from random import random, randint, choice
