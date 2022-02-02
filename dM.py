@@ -23,11 +23,11 @@ class Person:
         self.bloodType : str = choice(BLOOD_TYPES)
         self.alive : bool = True 
         
-        # age modifiers
+        # Modifers 
         self.getAgeBasedModifiers(0)
         self.getAgeBasedModifiers(1)
-
         self.overallHealth = 1 - (self.age/100)**8
+        self.getBloodTypeModifier()
 
         ## Personal variables
         self.social : float = random()
@@ -59,15 +59,15 @@ class Person:
         # Infected By
         i = ""
         for index in self.peopleWhoInfectedThem:
-            i = self.getStats(i, index)
+            i = self.getStats(i, index,population)
         # People infected 
         pI = ""
         for index in self.peopleInfected:
-            pI = self.getStats(pI, index)
+            pI = self.getStats(pI, index,population)
         # Assists 
         aI = ""
         for index in self.assist:
-            aI = self.getStats(aI. index)
+            aI = self.getStats(aI. index,population)
         print(f"""
         Firstname : {self.firstname}
         Surname : {self.lastname}
@@ -88,9 +88,16 @@ class Person:
         """)
     
     # used to format the variable in the stats section of the class __init__
-    def getStats(self, value, index):
+    def getStats(self, value, index , population):
         value += f"{population[index].firstname} {population[index].lastname} , "
         return value
+
+    # Might need to get changed depening how we implement the chanceOfDying formula 
+    def getBloodTypeModifier(self):
+        if self.bloodType == CONSTANTS["diseaseConstants"]["bloodTypeMostEffected"]:
+            self.bloodTypeEffect = CONSTANTS["diseaseConstants"]["bloodTypeEffect"]
+        else:
+            self.bloodTypeEffect -= CONSTANTS["diseaseConstants"]["bloodTypeEffect"]
 
     # refacted.com has visited this place
     def getAgeBasedModifiers(self, type):
@@ -127,30 +134,27 @@ class Person:
             self.immune = True 
         else:
             self.pImmune = True
+        
+        self.contagiousDays = 0
+        self.incubationDays = 0
 
     # refactor time
     def chanceOfDying(self):
-        ## Need to take into account age effect data 
-        # need to take into account disease dange 
         if not self.incubating:
-
-            # Have to take into account overall health, and decrease it if person doesn't get killed based on 
-            # Take into account age 
-            # CONSTANTS['diseaseConstants']['ageEffectModifier']
-            deathChance = random()
-            if self.bloodType == CONSTANTS['diseaseConstants']['bloodTypeMostSusceptible']:
-                bloodTypeModifer = 0.25
-            else:
-                bloodTypeModifer = 0 
-
-            defiDeath = self.ageModifier + self.overallHealth + self.ageModifier
-            if defiDeath < deathChance:
+            x = random()
+            y = random()
+            if x < y:
                 self.alive = False
                 self.overallHealth = 0.0
                 # do this outside of the function 
-                if self.peopleWhoInfectedThem:
-                    population[self.peopleWhoInfectedThem[-1]].assist.append(infectedPersonIndex)
-    
+               # if self.peopleWhoInfectedThem:
+                    #population[self.peopleWhoInfectedThem[-1]].assist.append(infectedPersonIndex)
+            else:
+                # if the difference is large decreases it by a little
+                # however if it's small it decreases it by alot 
+                difference = x - y
+                self.overallHealth = 1 - (self.age/100)**difference
+
     def newDay(self):
         if self.incubating:
             if self.incubationDays > CONSTANTS['diseaseConstants']['incubationPeriod']:
@@ -158,13 +162,20 @@ class Person:
                 self.contagious = True 
             else:
                 self.incubationDays += 1
-        else:
+        elif self.contagious:
             if self.contagiousDays > CONSTANTS['diseaseConstants']['contagiousPeriod']:  
                 self.contagious = False
                 self.infected = False
                 self.getImmunity()
             else:
                 self.contagiousDays +=1
+        else:
+            if self.particalImmunityDays > CONSTANTS['diseaseConstants']['partialImmunityPeriod']:
+                self.pImmune = False
+                self.particalImmunityDays = 0
+            else:
+                self.particalImmunityDays += 1
+
 
 # Refactor time baby 
 def spread(population, infected, infectedPersonIndex):
@@ -207,7 +218,7 @@ mortalityList = []
  
 # Creates the population made up of Person()
 population = [Person() for _ in range(CONSTANTS['cityConstants']['overallPopulation'])]
-population[0].infect()
+population[0].getInfected()
 population[0].groundZero = True
 infected.append(0)
 
@@ -223,15 +234,11 @@ while True:
     numPartiallyimune = 0
     numMortality = 0
     
-    # updates the partialImmunity people
-    # should put this inside the person class 
+    # updates the people with partial immunity 
     for person in partialImmunityList:
-        if population[person].particalImmunityDays > CONSTANTS['diseaseConstants']['partialImmunityPeriod']:
-            population[person].pImmune = False
+        population[person].newDay()
+        if population[person].pImmune == False:
             a = partialImmunityList.pop(person)
-            population[person].particalImmunityDays = 0
-        else:
-            population[person].particalImmunityDays += 1
 
     # updates an infected persons day 
     for person in infected:
@@ -251,7 +258,7 @@ while True:
 ## This code should be fine-ish 
 
     # Adding up the values
-    numNotInfected = CONSTANTS['cityConstants']['overallPopulation'] - len(infected) - len(moralityList)
+    numNotInfected = CONSTANTS['cityConstants']['overallPopulation'] - len(infected) - len(mortalityList)
     numInfected = len(infected)
     numImmune = len(immunityList)
     numPartiallyimune = len(partialImmunityList)
