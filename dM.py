@@ -213,14 +213,10 @@ def cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMorta
     Partially Immune : {numPartiallyimune}
     Mortality : {numMortality}''')
 
-## Store the index of people from population 
-# Stores the index of infected people 
+## Store the indexes of people from population 
 infected = []
-# Stores the index of people with parital immunity
 partialImmunityList = []
-# Stores the index of poeple with immunity 
 immunityList = []
-# Stores the index of people that are dead 
 mortalityList = []
  
 # Creates the population made up of Person()
