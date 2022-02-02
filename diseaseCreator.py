@@ -6,8 +6,8 @@ constants = ["diseaseConstants" , [('contagiousPeriod', 'int'),
                            ('partialImmunityPeriod', 'int'),
                            ("diseaseDanger", 'float'),
                            ("diseaseTransmisionRate", 'float'),
-                           ("bloodTypeMostSusceptible", 'str'),
-                           ("bloodTypeMostSusceptible", 'float'),
+                           ("bloodTypeMostEffected", 'str'),
+                           ("bloodTypeEffect", 'float'),
                            ("ageRangeMostSusceptible", '2 int i.e 50,100'),
                            ("ageRangeLeastSusceptible",'2 int i.e 1,20'),
                            ("ageSusceptibilityEffects", 'float'),
@@ -15,7 +15,7 @@ constants = ["diseaseConstants" , [('contagiousPeriod', 'int'),
                            ("ageRangeLeastEffected", "2 int i.e 1,20"),
                            ("ageEffect", 'float')],
      "cityConstants", [("overallPopulation", "int")],
-     "peopleConstants", [("overallPublicHealth","float")]
+     "peopleConstants", []
 ]
 
 data = {}
@@ -35,7 +35,7 @@ else:
 for i in range(3):
     if i == 0:
         name = "diseaseConstants"
-        qIndex = 1
+        qIndex = constants.index(name)+1
         data[name] = {}
     elif i == 1:
         name = "cityConstants"

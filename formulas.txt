@@ -1,0 +1,22 @@
+
+General Health:
+
+y = 1-(age/100)^8
+
+Death chance:
+
+Take into account self.overallHealth [Lower the chance]
+Take into account self.ageEffects[1] [Increase or Lower]
+Take into account self.bloodType  [lower if bad]
+    > CONSTANTS["diseaseConstants]["bloodTypeMostEffected"]
+    # Should it be called effect or changed to another name 
+    > CONSTANTS["diseaseConstants]["bloodTypeEffect]
+
+random_number < death chance 
+
+If not dead:
+reduce general health by the difference 
+
+random_value - death_chance = difference 
+
+gen = 1- (age/100)**difference 

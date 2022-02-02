@@ -27,8 +27,7 @@ class Person:
         self.getAgeBasedModifiers(0)
         self.getAgeBasedModifiers(1)
 
-        # need to change should take into account age
-        self.overallHealth = self.getOH()
+        self.overallHealth = 1 - (self.age/100)**8
 
         ## Personal variables
         self.social : float = random()
@@ -93,19 +92,6 @@ class Person:
         value += f"{population[index].firstname} {population[index].lastname} , "
         return value
 
-# Refact from here downwards [1/2/2022 19:07]
-    # reeeeefactor timeeee
-    def getOH(self):
-        # Need to take into account age , need to take into account overall public health
-        # Need to change calculation , random at the moment
-        ## Variables to use 
-        # CONSTANTS['peopleConstants']['overallPublicHealth']
-        # self.age 
-        
-        # being worked on 
-        
-        pass
-
     # refacted.com has visited this place
     def getAgeBasedModifiers(self, type):
         if type == 0:
@@ -116,7 +102,7 @@ class Person:
             aRL = 'ageRangeLeastEffected'
             aRM = 'ageRangeMostEffected'
             aE = 'ageEffect'
-        # Fist one appended is the susceptibilty[0] and second one is effect[1]
+        # First one appended is the susceptibilty[0] and second one is effect[1]
         # susceptibilty effects chance to catch it and effect , effects chance to die
         if self.age >= CONSTANTS['diseaseConstants'][aRL][0] and self.age <= CONSTANTS['diseaseConstants'][aRL][1]:
             self.ageEffects.append(CONSTANTS['diseaseConstants'][aE])
@@ -269,7 +255,7 @@ while True:
     numInfected = len(infected)
     numImmune = len(immunityList)
     numPartiallyimune = len(partialImmunityList)
-    numMortality = len(moralityList)
+    numMortality = len(mortalityList)
 
     if outD == 0:
         cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMortality)
