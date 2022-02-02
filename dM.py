@@ -213,16 +213,21 @@ def cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMorta
     Partially Immune : {numPartiallyimune}
     Mortality : {numMortality}''')
 
+## Store the index of people from population 
+# Stores the index of infected people 
+infected = []
+# Stores the index of people with parital immunity
+partialImmunityList = []
+# Stores the index of poeple with immunity 
+immunityList = []
+# Stores the index of people that are dead 
+mortalityList = []
+ 
+# Creates the population made up of Person()
 population = [Person() for _ in range(CONSTANTS['cityConstants']['overallPopulation'])]
 population[0].infect()
-
-# Store's the index of the infected people
-infected = []
-infected.append(0)
 population[0].groundZero = True
-partialImmunityList = []
-immunityList = []
-moralityList = []
+infected.append(0)
 
 outD = int(input('Please input wether you would like data on a per day[0], per week[1], per month[2] or per year[3] basis [0,1,2,3] > '))
 
@@ -230,8 +235,14 @@ day = 0
 while True:
     # Should refactor
     day += 1
-
+    numNotInfected = 0
+    numInfected = 0
+    numImmune = 0
+    numPartiallyimune = 0
+    numMortality = 0
+    
     # updates the partialImmunity people
+    # should put this inside the person class 
     for person in partialImmunityList:
         if population[person].particalImmunityDays > CONSTANTS['diseaseConstants']['partialImmunityPeriod']:
             population[person].pImmune = False
