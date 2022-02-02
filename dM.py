@@ -2,9 +2,11 @@ import json
 import names
 from random import random, randint, choice
 
-json_file_to_load = 'Broncitis'
+json_file_to_load = 'COVID'
 
 ## Constants
+
+TEST_TIME = False 
 
 BLOOD_TYPES  = ['A','B','O']
 
@@ -24,9 +26,11 @@ class Person:
         self.alive : bool = True 
         
         # Modifers 
+        self.ageEffects = []
         self.getAgeBasedModifiers(0)
         self.getAgeBasedModifiers(1)
-        self.overallHealth = 1 - (self.age/100)**8
+        self.overallHealth = 1 - ((self.age/100)**CONSTANTS['peopleConstants']['overallHealthCalculationPower'])
+        self.bloodTypeEffect = 0
         self.getBloodTypeModifier()
 
         ## Personal variables
@@ -74,9 +78,9 @@ class Person:
         Age : {self.age}
         Bloodtype : {self.bloodType}
         Alive : {self.alive}
-        Overall health : {self.overallHealth}
+        Overall healthiness : {self.overallHealth}
 
-                STATS
+               || STATS ||
 
         Infected : {self.infected}
         First Infected : {self.groundZero}
@@ -178,6 +182,7 @@ class Person:
 
 
 # Refactor time baby 
+'''
 def spread(population, infected, infectedPersonIndex):
     ## Need to take into account age suseptiable data 
     # Change calculation, really needs to change
@@ -198,7 +203,7 @@ def spread(population, infected, infectedPersonIndex):
                         infected.append(person)
                         population[].peopleInfected.append(person)
                         population[person].peopleWhoInfectedThem.append(infectedPersonIndex)
-        
+'''
 # Visual display of the city, will be converted to matplotlib after the refactor 
 def cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMortality):
     # Should display number of days/weeks/months/years
@@ -222,10 +227,10 @@ population[0].getInfected()
 population[0].groundZero = True
 infected.append(0)
 
-outD = int(input('Please input wether you would like data on a per day[0], per week[1], per month[2] or per year[3] basis [0,1,2,3] > '))
+outD = int(input('Please input whether you would like data on a per day[0], per week[1], per month[2] or per year[3] basis [0,1,2,3] > '))
 
 day = 0
-while True:
+while TEST_TIME:
     # Should refactor
     day += 1
     numNotInfected = 0
@@ -249,8 +254,8 @@ while True:
             partialImmunityList.append(infected.pop(person))
 
     # spreads the disease 
-    for person in infected:
-        spread(population, infected, person)
+    #for person in infected:
+        #spread(population, infected, person)
     
     for person in infected:
         population[person].chanceOfDying()
@@ -279,3 +284,7 @@ while True:
         if day % 360 == 0:
             cityData(numNotInfected, numInfected, numImmune, numPartiallyimune, numMortality)
             input('Next Year > ') 
+
+for person in population:
+    person.display_personal_info(population)
+    input('> ')

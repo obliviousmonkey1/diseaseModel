@@ -14,8 +14,8 @@ constants = ["diseaseConstants" , [('contagiousPeriod', 'int'),
                            ("ageRangeMostEffected" , "2 int i.e 50,100"),
                            ("ageRangeLeastEffected", "2 int i.e 1,20"),
                            ("ageEffect", 'float')],
-     "cityConstants", [("overallPopulation", "int")],
-     "peopleConstants", []
+     "cityConstants", [("overallPopulation", "int (500+)")],
+     "peopleConstants", [("overallHealthCalculationPower","int (1-8)")]
 ]
 
 data = {}
@@ -60,26 +60,28 @@ for i in range(3):
                 y = y.split(',')
                 y[0], y[1] = int(y[0]), int(y[1])
             data[name][constants[qIndex][index][0]] = y
-        elif constants[qIndex][index][1] == 'int':
+        elif constants[qIndex][index][1][:3] == 'int':
             if randomConfig:
                 if qIndex == 1:
                     y = randint(0,20)
                 elif qIndex == 3:
                     y = randint(500,1000)
-                else:
+                elif qIndex == 5:
+                    if index == 0:
+                        y = randint(1,8)
                     pass
                 print(y)
             else:
                 y = int(input('> '))
             data[name][constants[qIndex][index][0]] = y
-        elif constants[qIndex][index][1] == 'float':
+        elif constants[qIndex][index][1][:5]  == 'float':
             if randomConfig:
                 y = random()
                 print(y)
             else:
                 y = float(input('> '))
             data[name][constants[qIndex][index][0]] = y
-        elif constants[qIndex][index][1] == 'str':
+        elif constants[qIndex][index][1][:3] == 'str':
             if randomConfig:
                 if qIndex == 1:
                     if constants[qIndex][index][0][0] == 'b':
@@ -92,7 +94,7 @@ for i in range(3):
             else:
                 y = input('> ')
             data[name][constants[qIndex][index][0]] = y
-        elif constants[qIndex][index][1] == 'bool':
+        elif constants[qIndex][index][1][:4]  == 'bool':
             if randomConfig:
                 y = bool(getrandbits(1))
                 print(y)
