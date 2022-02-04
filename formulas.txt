@@ -16,4 +16,4 @@ random_number < death chance
 
 If not dead:
 
-reduce overall health 
+reduce overall health by x amount
