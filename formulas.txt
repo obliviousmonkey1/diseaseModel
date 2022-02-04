@@ -15,8 +15,5 @@ Take into account self.bloodType  [lower if bad]
 random_number < death chance 
 
 If not dead:
-reduce general health by the difference 
 
-random_value - death_chance = difference 
-
-gen = 1- (age/100)**difference 
+reduce overall health 
